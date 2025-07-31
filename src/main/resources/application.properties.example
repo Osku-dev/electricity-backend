@@ -1,0 +1,3 @@
+spring.application.name=electricity-backend
+DAILY_PRICES_URL = dailyPricesApiUrl
+HOURLY_PRICE_URL = hourlyPricesApiUrl

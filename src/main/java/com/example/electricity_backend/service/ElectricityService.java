@@ -1,6 +1,7 @@
 package com.example.electricity_backend.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,9 @@ import java.util.Map;
 public class ElectricityService {
 
     private final RestTemplate restTemplate;
+    @Value("${DAILY_PRICES_URL}")
     private final String DAILY_PRICES_URL = "https://api.porssisahko.net/v1/latest-prices.json";
+    @Value("${HOURLY_PRICE_URL}")
     private final String HOURLY_PRICE_URL = "https://api.porssisahko.net/v1/price.json?date={date}&hour={hour}";
 
     @Autowired

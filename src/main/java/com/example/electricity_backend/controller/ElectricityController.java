@@ -3,6 +3,7 @@ package com.example.electricity_backend.controller;
 import com.example.electricity_backend.model.ElectricityPrice;
 import com.example.electricity_backend.model.HourlyElectricityPrice;
 import com.example.electricity_backend.service.ElectricityService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,11 +12,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@CrossOrigin(origins = "${FRONTEND_URL}")
 @RestController
 @RequestMapping("/api/prices")
 public class ElectricityController {
 
     private final ElectricityService electricityService;
+    
 
     @Autowired
     public ElectricityController(ElectricityService electricityService) {
