@@ -22,9 +22,9 @@ public class ElectricityService {
 
     private final RestTemplate restTemplate;
     @Value("${DAILY_PRICES_URL}")
-    private final String DAILY_PRICES_URL = "https://api.porssisahko.net/v1/latest-prices.json";
+    private String DAILY_PRICES_URL;
     @Value("${HOURLY_PRICE_URL}")
-    private final String HOURLY_PRICE_URL = "https://api.porssisahko.net/v1/price.json?date={date}&hour={hour}";
+    private String HOURLY_PRICE_URL;
 
     @Autowired
     public ElectricityService(RestTemplate restTemplate) {
