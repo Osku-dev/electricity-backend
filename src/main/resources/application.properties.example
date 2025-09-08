@@ -1,3 +1,12 @@
 spring.application.name=electricity-backend
-DAILY_PRICES_URL = dailyPricesApiUrl
-HOURLY_PRICE_URL = hourlyPricesApiUrl
+spring.profiles.active=dev
+DAILY_PRICES_URL = externalApi
+HOURLY_PRICE_URL = externalApi
+FRONTEND_URL = FRONTEND_URL
+server.address=127.0.0.1 or 0.0.0.0 for expo
+spring.datasource.url=dbUrl
+spring.datasource.username=username
+spring.datasource.password=password
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
