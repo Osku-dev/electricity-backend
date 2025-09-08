@@ -1,11 +1,11 @@
-package com.example.electricity_backend.model;
+package com.example.electricity_backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
-public class HourlyElectricityPrice {
+@Value
+public class HourlyElectricityPriceDto {
 
     private Double price;
 

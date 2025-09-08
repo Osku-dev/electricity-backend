@@ -8,9 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.electricity_backend.model.ElectricityPrice;
-import com.example.electricity_backend.model.ElectricityPriceResponse;
-import com.example.electricity_backend.model.HourlyElectricityPrice;
+import com.example.electricity_backend.dto.ElectricityPriceDto;
+import com.example.electricity_backend.dto.ElectricityPriceResponseDto;
+import com.example.electricity_backend.dto.HourlyElectricityPriceDto;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class ElectricityService {
+public class ExternalPriceService {
 
     private final RestTemplate restTemplate;
     @Value("${DAILY_PRICES_URL}")
@@ -27,18 +27,18 @@ public class ElectricityService {
     private String HOURLY_PRICE_URL;
 
     @Autowired
-    public ElectricityService(RestTemplate restTemplate) {
+    public ExternalPriceService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
     
    @SuppressWarnings("null")
-   public List<ElectricityPrice> fetchElectricityData() {
+   public List<ElectricityPriceDto> fetchDailyPrices() {
     try {
-        ResponseEntity<ElectricityPriceResponse> response = restTemplate.exchange(
+        ResponseEntity<ElectricityPriceResponseDto> response = restTemplate.exchange(
             DAILY_PRICES_URL,
             HttpMethod.GET,
             null,
-            new ParameterizedTypeReference<ElectricityPriceResponse>() {}
+            new ParameterizedTypeReference<ElectricityPriceResponseDto>() {}
         );
 
         if (response.getBody() != null && response.getBody().getPrices() != null) {
@@ -55,13 +55,13 @@ public class ElectricityService {
 }
 
 @SuppressWarnings("null")
-public HourlyElectricityPrice fetchHourlyPrice(String date, int hour) {
+public HourlyElectricityPriceDto fetchHourlyPrice(String date, int hour) {
     try {
-        ResponseEntity<HourlyElectricityPrice> response = restTemplate.exchange(
+        ResponseEntity<HourlyElectricityPriceDto> response = restTemplate.exchange(
             HOURLY_PRICE_URL,
             HttpMethod.GET,
             null,
-            new ParameterizedTypeReference<HourlyElectricityPrice>() {},
+            new ParameterizedTypeReference<HourlyElectricityPriceDto>() {},
             date,
             hour
         );
@@ -79,14 +79,14 @@ public HourlyElectricityPrice fetchHourlyPrice(String date, int hour) {
     }
 }
 
-public Map<String, Double> calculateDailyStats(List<ElectricityPrice> prices) {
+public Map<String, Double> calculateDailyStats(List<ElectricityPriceDto> prices) {
     if (prices == null || prices.isEmpty()) {
         return Map.of("min", 0.0, "max", 0.0, "average", 0.0);
     }
 
-    double min = prices.stream().mapToDouble(ElectricityPrice::getPrice).min().orElse(0.0);
-    double max = prices.stream().mapToDouble(ElectricityPrice::getPrice).max().orElse(0.0);
-    double avg = prices.stream().mapToDouble(ElectricityPrice::getPrice).average().orElse(0.0);
+    double min = prices.stream().mapToDouble(ElectricityPriceDto::getPrice).min().orElse(0.0);
+    double max = prices.stream().mapToDouble(ElectricityPriceDto::getPrice).max().orElse(0.0);
+    double avg = prices.stream().mapToDouble(ElectricityPriceDto::getPrice).average().orElse(0.0);
 
     return Map.of(
         "min", min,
@@ -95,17 +95,17 @@ public Map<String, Double> calculateDailyStats(List<ElectricityPrice> prices) {
     );
 }
 
-public List<ElectricityPrice> findCheapestChargingWindow(List<ElectricityPrice> prices, int hours) {
+public List<ElectricityPriceDto> findCheapestChargingWindow(List<ElectricityPriceDto> prices, int hours) {
     if (prices == null || prices.size() < hours) {
         return Collections.emptyList();
     }
 
-    List<ElectricityPrice> cheapestWindow = new ArrayList<>();
+    List<ElectricityPriceDto> cheapestWindow = new ArrayList<>();
     double minSum = Double.MAX_VALUE;
 
     for (int i = 0; i <= prices.size() - hours; i++) {
-        List<ElectricityPrice> window = prices.subList(i, i + hours);
-        double sum = window.stream().mapToDouble(ElectricityPrice::getPrice).sum();
+        List<ElectricityPriceDto> window = prices.subList(i, i + hours);
+        double sum = window.stream().mapToDouble(ElectricityPriceDto::getPrice).sum();
 
         if (sum < minSum) {
             minSum = sum;

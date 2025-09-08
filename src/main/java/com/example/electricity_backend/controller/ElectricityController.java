@@ -1,8 +1,8 @@
 package com.example.electricity_backend.controller;
 
-import com.example.electricity_backend.model.ElectricityPrice;
-import com.example.electricity_backend.model.HourlyElectricityPrice;
-import com.example.electricity_backend.service.ElectricityService;
+import com.example.electricity_backend.dto.ElectricityPriceDto;
+import com.example.electricity_backend.dto.HourlyElectricityPriceDto;
+import com.example.electricity_backend.service.ExternalPriceService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,25 +17,25 @@ import java.util.Map;
 @RequestMapping("/api/prices")
 public class ElectricityController {
 
-    private final ElectricityService electricityService;
+    private final ExternalPriceService electricityService;
     
 
     @Autowired
-    public ElectricityController(ElectricityService electricityService) {
+    public ElectricityController(ExternalPriceService electricityService) {
         this.electricityService = electricityService;
     }
 
     @GetMapping
-    public List<ElectricityPrice> getLatestPrices() {
-        return electricityService.fetchElectricityData();
+    public List<ElectricityPriceDto> getLatestPrices() {
+        return electricityService.fetchDailyPrices();
     }
 
     @GetMapping("/by-hour")
-    public ResponseEntity<HourlyElectricityPrice> getHourlyPrice(
+    public ResponseEntity<HourlyElectricityPriceDto> getHourlyPrice(
         @RequestParam String date,
         @RequestParam int hour) {
     
-    HourlyElectricityPrice price = electricityService.fetchHourlyPrice(date, hour);
+    HourlyElectricityPriceDto price = electricityService.fetchHourlyPrice(date, hour);
     
     if (price != null) {
         return ResponseEntity.ok(price);
@@ -47,13 +47,13 @@ public class ElectricityController {
 
 @GetMapping("/stats")
 public Map<String, Double> getPriceStats() {
-    List<ElectricityPrice> prices = electricityService.fetchElectricityData();
+    List<ElectricityPriceDto> prices = electricityService.fetchDailyPrices();
     return electricityService.calculateDailyStats(prices);
 }
 
 @GetMapping("/cheapest-window")
-public List<ElectricityPrice> getCheapestChargingWindow(@RequestParam int hours) {
-    List<ElectricityPrice> prices = electricityService.fetchElectricityData();
+public List<ElectricityPriceDto> getCheapestChargingWindow(@RequestParam int hours) {
+    List<ElectricityPriceDto> prices = electricityService.fetchDailyPrices();
     return electricityService.findCheapestChargingWindow(prices, hours);
 }
 
