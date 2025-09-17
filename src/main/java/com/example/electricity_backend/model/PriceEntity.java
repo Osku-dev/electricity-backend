@@ -11,7 +11,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "prices")
+@Table(name = "prices",
+       uniqueConstraints = @UniqueConstraint(columnNames = {"start_time", "resolution_minutes"})) // Ensure no duplicate entries for the same start time and resolution
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,6 +29,6 @@ public class PriceEntity {
     @Column(name = "price_cents", nullable = false)
     private BigDecimal price;
 
-    @Column(name = "resolution_minutes", nullable = false)
+    @Column(name = "resolution_minutes", precision = 10, scale = 3, nullable = false)
     private int resolutionMinutes;
 }

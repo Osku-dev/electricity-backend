@@ -1,0 +1,22 @@
+type PriceConnection {
+  edges: [PriceEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PriceEdge {
+  node: Price!
+  cursor: String!
+}
+
+type Price {
+  timestamp: String!
+  value: Float!
+  resolutionMinutes: String!
+}
+
+type PageInfo {
+  startCursor: String
+  endCursor: String
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
+}

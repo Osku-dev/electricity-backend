@@ -1,0 +1,8 @@
+type Query {
+  prices(
+    first: Int
+    after: String
+    last: Int
+    before: String
+  ): PriceConnection!
+}

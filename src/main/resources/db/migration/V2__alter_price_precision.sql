@@ -1,0 +1,2 @@
+ALTER TABLE prices
+ALTER COLUMN price_cents TYPE NUMERIC(10,3);

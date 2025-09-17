@@ -2,9 +2,12 @@ package com.example.electricity_backend.service;
 
 import com.example.electricity_backend.model.PriceEntity;
 import com.example.electricity_backend.repository.PriceRepository;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -40,8 +43,8 @@ public class PriceService {
     /**
      * Fetch prices within a given date/time range.
      */
-    public List<PriceEntity> getPricesBetween(LocalDateTime start, LocalDateTime end) {
-        return priceRepository.findByStartTimeBetween(start, end);
+    public List<PriceEntity> getPricesBetween(LocalDateTime start) {
+        return priceRepository.findByStartTimeAfter(start);
     }
 
     /**
@@ -63,5 +66,37 @@ public class PriceService {
      */
     public void deleteAllPrices() {
         priceRepository.deleteAll();
+    }
+
+    // Forward pagination
+    public List<PriceEntity> getPricesAfter(LocalDateTime after, int limit) {
+        return priceRepository.findByStartTimeAfterOrderByStartTimeAsc(
+                after,
+                PageRequest.of(0, limit)
+        );
+    }
+
+    // Backward pagination
+    public List<PriceEntity> getPricesBefore(LocalDateTime before, int limit) {
+        List<PriceEntity> entities = priceRepository.findByStartTimeBeforeOrderByStartTimeDesc(
+                before,
+                PageRequest.of(0, limit)
+        );
+        Collections.reverse(entities); // for Relay ASC order
+        return entities;
+    }
+
+    // Default newest N
+    public List<PriceEntity> getNewest(int limit) {
+        List<PriceEntity> entities = priceRepository.findAllByOrderByStartTimeDesc(
+                PageRequest.of(0, limit)
+        );
+        Collections.reverse(entities); // ASC order
+        return entities;
+    }
+
+    // Default oldest N
+    public List<PriceEntity> getOldest(int limit) {
+        return priceRepository.findAllByOrderByStartTimeAsc(PageRequest.of(0, limit));
     }
 }
