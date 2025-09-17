@@ -42,7 +42,9 @@ public class ExternalPriceService {
         );
 
         if (response.getBody() != null && response.getBody().getPrices() != null) {
-            return response.getBody().getPrices();
+            List<ElectricityPriceDto> prices = new ArrayList<>(response.getBody().getPrices());
+            Collections.reverse(prices);
+            return prices;
         } else {
             System.err.println("Error: The response body or prices are null.");
             return Collections.emptyList();
