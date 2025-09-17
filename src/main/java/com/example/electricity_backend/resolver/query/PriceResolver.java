@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
 import com.example.electricity_backend.connection.CursorUtil;
@@ -54,7 +53,7 @@ public class PriceResolver{
             entities = priceService.getNewest(last);
 
         } else {
-            entities = priceService.getNewest(50);
+            entities = priceService.getNewest(48); // Newest 48 hours, will be 192 entries for 15min resolution
         }
 
         // Map entities to DTOs
