@@ -37,23 +37,55 @@ public class PriceResolver{
             @Argument String before
     ) {
         List<PriceEntity> entities;
+        boolean hasNextPage = false;
+        boolean hasPreviousPage = false;
 
         if (after != null && first != null) {
             LocalDateTime afterTime = LocalDateTime.parse(cursorUtil.decodeCursor(after));
             entities = priceService.getPricesAfter(afterTime, first);
 
+            if (entities.size() > first) {
+            hasNextPage = true;
+            entities = entities.subList(0, first);
+        }
+        
+        hasPreviousPage = after != null;
+
+
         } else if (before != null && last != null) {
             LocalDateTime beforeTime = LocalDateTime.parse(cursorUtil.decodeCursor(before));
             entities = priceService.getPricesBefore(beforeTime, last);
 
+            if (entities.size() > last) {
+            hasPreviousPage = true;
+            entities = entities.subList(0, last);
+        }
+        
+        hasNextPage = before != null;
+
         } else if (first != null) {
             entities = priceService.getOldest(first);
+
+            if (entities.size() > first) {
+            hasNextPage = true;
+            entities = entities.subList(0, first);
+        }
 
         } else if (last != null) {
             entities = priceService.getNewest(last);
 
+             if (entities.size() > last) {
+            hasPreviousPage = true;
+            entities = entities.subList(0, last);
+        }
+
         } else {
             entities = priceService.getNewest(48); // Newest 48 hours, will be 192 entries for 15min resolution
+
+            if (entities.size() > 48) {
+            hasPreviousPage = true;
+            entities = entities.subList(0, 48);
+        }
         }
 
         // Map entities to DTOs
@@ -73,8 +105,8 @@ public class PriceResolver{
         var pageInfo = new DefaultPageInfo(
                 cursorUtil.getFirstCursorFrom(edges),
                 cursorUtil.getLastCursorFrom(edges),
-                before != null,
-                after != null
+                hasPreviousPage,
+                hasNextPage
         );
 
         return new DefaultConnection<>(edges, pageInfo);

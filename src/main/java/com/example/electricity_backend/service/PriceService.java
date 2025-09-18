@@ -67,12 +67,12 @@ public class PriceService {
     public void deleteAllPrices() {
         priceRepository.deleteAll();
     }
-
+    // +1 for pageInfo hasNextPage/hasPreviousPage checks
     // Forward pagination
     public List<PriceEntity> getPricesAfter(LocalDateTime after, int limit) {
         return priceRepository.findByStartTimeAfterOrderByStartTimeAsc(
                 after,
-                PageRequest.of(0, limit)
+                PageRequest.of(0, limit + 1)
         );
     }
 
@@ -80,7 +80,7 @@ public class PriceService {
     public List<PriceEntity> getPricesBefore(LocalDateTime before, int limit) {
         List<PriceEntity> entities = priceRepository.findByStartTimeBeforeOrderByStartTimeDesc(
                 before,
-                PageRequest.of(0, limit)
+                PageRequest.of(0, limit + 1)
         );
         Collections.reverse(entities); // for Relay ASC order
         return entities;
@@ -89,7 +89,7 @@ public class PriceService {
     // Default newest N
     public List<PriceEntity> getNewest(int limit) {
         List<PriceEntity> entities = priceRepository.findAllByOrderByStartTimeDesc(
-                PageRequest.of(0, limit)
+                PageRequest.of(0, limit + 1)
         );
         Collections.reverse(entities); // ASC order
         return entities;
@@ -97,6 +97,6 @@ public class PriceService {
 
     // Default oldest N
     public List<PriceEntity> getOldest(int limit) {
-        return priceRepository.findAllByOrderByStartTimeAsc(PageRequest.of(0, limit));
+        return priceRepository.findAllByOrderByStartTimeAsc(PageRequest.of(0, limit + 1));
     }
 }
