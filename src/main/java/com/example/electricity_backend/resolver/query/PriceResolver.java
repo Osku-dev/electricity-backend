@@ -40,6 +40,8 @@ public class PriceResolver{
         boolean hasNextPage = false;
         boolean hasPreviousPage = false;
 
+        validatePaginationArgs(first, last, after, before);
+
         if (after != null && first != null) {
             LocalDateTime afterTime = LocalDateTime.parse(cursorUtil.decodeCursor(after));
             entities = priceService.getPricesAfter(afterTime, first);
@@ -79,13 +81,16 @@ public class PriceResolver{
             entities = entities.subList(0, last);
         }
 
-        } else {
+        } else if (first == null && last == null && after == null && before == null) {
             entities = priceService.getNewest(48); // Newest 48 hours, will be 192 entries for 15min resolution
 
             if (entities.size() > 48) {
             hasPreviousPage = true;
             entities = entities.subList(0, 48);
         }
+
+        } else {
+            throw new IllegalArgumentException("Invalid pagination arguments");
         }
 
         // Map entities to DTOs
@@ -111,4 +116,26 @@ public class PriceResolver{
 
         return new DefaultConnection<>(edges, pageInfo);
     }
+
+    private void validatePaginationArgs(Integer first, Integer last, String after, String before) {
+    boolean hasFirst = first != null;
+    boolean hasLast = last != null;
+    boolean hasAfter = after != null;
+    boolean hasBefore = before != null;
+
+    // not allowed: both first and last
+    if (hasFirst && hasLast) {
+        throw new IllegalArgumentException("Cannot use 'first' and 'last' together");
+    }
+
+    // not allowed: first + before
+    if (hasFirst && hasBefore) {
+        throw new IllegalArgumentException("Cannot use 'first' with 'before'");
+    }
+
+    // not allowed: last + after
+    if (hasLast && hasAfter) {
+        throw new IllegalArgumentException("Cannot use 'last' with 'after'");
+    }
+}
 }
