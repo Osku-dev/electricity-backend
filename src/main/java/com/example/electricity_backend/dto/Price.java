@@ -1,20 +1,20 @@
 package com.example.electricity_backend.dto;
 
-import jakarta.persistence.Column;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.lang.NonNull;
 
-@Getter
-@Setter
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
+
+@RequiredArgsConstructor
+@Value
 // graphql dto
 public class Price {
-    @Column(nullable = false)
+    @NonNull
     private String timestamp;
 
-    @Column(nullable = false)
     private float value;
 
-    @Column(nullable = false)
+    @NonNull
     private String resolutionMinutes;
 
     

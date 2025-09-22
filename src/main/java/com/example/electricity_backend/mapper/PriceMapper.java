@@ -31,11 +31,7 @@ public class PriceMapper {
      * Convert JPA Entity → GraphQL DTO.
      */
     public static Price fromEntity(PriceEntity entity) {
-    Price dto = new Price();
-    dto.setTimestamp(entity.getStartTime().toString()); 
-    dto.setValue(entity.getPrice().floatValue());
-    dto.setResolutionMinutes(Integer.toString(entity.getResolutionMinutes()));
-    return dto;
+    return new Price(entity.getStartTime().toString(), entity.getPrice().floatValue(), Integer.toString(entity.getResolutionMinutes()));
 }
 
 
