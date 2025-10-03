@@ -33,7 +33,7 @@ public class ElectricityPriceSyncService {
             """;
 
         List<Object[]> batchArgs = dtos.stream()
-            .map(dto -> PriceMapper.toEntity(dto, 60))
+            .map(dto -> PriceMapper.toEntity(dto, 15))
             .map(entity -> new Object[] {
                 entity.getStartTime(),
                 entity.getPrice(),
