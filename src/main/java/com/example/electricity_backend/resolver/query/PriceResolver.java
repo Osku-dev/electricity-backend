@@ -82,11 +82,11 @@ public class PriceResolver{
         }
 
         } else if (first == null && last == null && after == null && before == null) {
-            entities = priceService.getNewest(48); // Newest 48 hours, will be 192 entries for 15min resolution
+            entities = priceService.getNewest(192); // Newest 48 hours, will be 192 entries for 15min resolution
 
-            if (entities.size() > 48) {
+            if (entities.size() > 192) {
             hasPreviousPage = true;
-            entities = entities.subList(0, 48);
+            entities = entities.subList(0, 192);
         }
 
         } else {
