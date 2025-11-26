@@ -1,12 +1,12 @@
 package com.example.electricity_backend.dto;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ElectricityPriceResponseDto {
-    private final List<ElectricityPriceDto> prices;
+public class Stats {
+    private final Float minPrice;
+    private final Float maxPrice;
+    private final Float avgPrice;
 }

@@ -1,5 +1,7 @@
 package com.example.electricity_backend.resolver.query;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,12 +12,12 @@ import org.springframework.stereotype.Controller;
 
 import com.example.electricity_backend.connection.CursorUtil;
 import com.example.electricity_backend.dto.Price;
+import com.example.electricity_backend.dto.PriceConnectionWithStats;
+import com.example.electricity_backend.dto.Stats;
 import com.example.electricity_backend.mapper.PriceMapper;
 import com.example.electricity_backend.model.PriceEntity;
 import com.example.electricity_backend.service.PriceService;
 
-import graphql.relay.Connection;
-import graphql.relay.DefaultConnection;
 import graphql.relay.DefaultEdge;
 import graphql.relay.DefaultPageInfo;
 import graphql.relay.Edge;
@@ -23,14 +25,13 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-public class PriceResolver{
+public class PriceResolver {
 
     private final PriceService priceService;
     private final CursorUtil cursorUtil;
 
-
-@QueryMapping
-    public Connection<Price> prices(
+    @QueryMapping
+    public PriceConnectionWithStats prices(
             @Argument Integer first,
             @Argument String after,
             @Argument Integer last,
@@ -45,49 +46,41 @@ public class PriceResolver{
         if (after != null && first != null) {
             LocalDateTime afterTime = LocalDateTime.parse(cursorUtil.decodeCursor(after));
             entities = priceService.getPricesAfter(afterTime, first);
-
             if (entities.size() > first) {
-            hasNextPage = true;
-            entities = entities.subList(0, first);
-        }
-        
-        hasPreviousPage = after != null;
-
+                hasNextPage = true;
+                entities = entities.subList(0, first);
+            }
+            hasPreviousPage = after != null;
 
         } else if (before != null && last != null) {
             LocalDateTime beforeTime = LocalDateTime.parse(cursorUtil.decodeCursor(before));
             entities = priceService.getPricesBefore(beforeTime, last);
-
             if (entities.size() > last) {
-            hasPreviousPage = true;
-            entities = entities.subList(0, last);
-        }
-        
-        hasNextPage = before != null;
+                hasPreviousPage = true;
+                entities = entities.subList(0, last);
+            }
+            hasNextPage = before != null;
 
         } else if (first != null) {
             entities = priceService.getOldest(first);
-
             if (entities.size() > first) {
-            hasNextPage = true;
-            entities = entities.subList(0, first);
-        }
+                hasNextPage = true;
+                entities = entities.subList(0, first);
+            }
 
         } else if (last != null) {
             entities = priceService.getNewest(last);
-
-             if (entities.size() > last) {
-            hasPreviousPage = true;
-            entities = entities.subList(0, last);
-        }
+            if (entities.size() > last) {
+                hasPreviousPage = true;
+                entities = entities.subList(0, last);
+            }
 
         } else if (first == null && last == null && after == null && before == null) {
-            entities = priceService.getNewest(192); // Newest 48 hours, will be 192 entries for 15min resolution
-
+            entities = priceService.getNewest(192); // newest 48h entries for 15min resolution
             if (entities.size() > 192) {
-            hasPreviousPage = true;
-            entities = entities.subList(0, 192);
-        }
+                hasPreviousPage = true;
+                entities = entities.subList(0, 192);
+            }
 
         } else {
             throw new IllegalArgumentException("Invalid pagination arguments");
@@ -97,6 +90,9 @@ public class PriceResolver{
         List<Price> prices = entities.stream()
                 .map(PriceMapper::fromEntity)
                 .collect(Collectors.toList());
+
+        // Compute stats
+        Stats stats = computeStats(prices);
 
         // Build edges for cursor pagination
         List<Edge<Price>> edges = prices.stream()
@@ -114,28 +110,42 @@ public class PriceResolver{
                 hasNextPage
         );
 
-        return new DefaultConnection<>(edges, pageInfo);
+        return new PriceConnectionWithStats(edges, pageInfo, stats);
     }
+
+    private Stats computeStats(List<Price> prices) {
+    if (prices.isEmpty()) return new Stats(BigDecimal.ZERO.floatValue(),
+                                           BigDecimal.ZERO.floatValue(),
+                                           BigDecimal.ZERO.floatValue());
+
+    BigDecimal min = BigDecimal.valueOf(Float.MAX_VALUE);
+    BigDecimal max = BigDecimal.valueOf(Float.MIN_VALUE);
+    BigDecimal sum = BigDecimal.ZERO;
+
+    for (Price p : prices) {
+        BigDecimal price = BigDecimal.valueOf(p.getValue());
+        if (price.compareTo(min) < 0) min = price;
+        if (price.compareTo(max) > 0) max = price;
+        sum = sum.add(price);
+    }
+
+    BigDecimal avg = sum.divide(BigDecimal.valueOf(prices.size()), 2, RoundingMode.HALF_UP);
+
+    // Round min and max to 2 decimals
+    min = min.setScale(2, RoundingMode.HALF_UP);
+    max = max.setScale(2, RoundingMode.HALF_UP);
+
+    return new Stats(min.floatValue(), max.floatValue(), avg.floatValue());
+}
 
     private void validatePaginationArgs(Integer first, Integer last, String after, String before) {
-    boolean hasFirst = first != null;
-    boolean hasLast = last != null;
-    boolean hasAfter = after != null;
-    boolean hasBefore = before != null;
+        boolean hasFirst = first != null;
+        boolean hasLast = last != null;
+        boolean hasAfter = after != null;
+        boolean hasBefore = before != null;
 
-    // not allowed: both first and last
-    if (hasFirst && hasLast) {
-        throw new IllegalArgumentException("Cannot use 'first' and 'last' together");
+        if (hasFirst && hasLast) throw new IllegalArgumentException("Cannot use 'first' and 'last' together");
+        if (hasFirst && hasBefore) throw new IllegalArgumentException("Cannot use 'first' with 'before'");
+        if (hasLast && hasAfter) throw new IllegalArgumentException("Cannot use 'last' with 'after'");
     }
-
-    // not allowed: first + before
-    if (hasFirst && hasBefore) {
-        throw new IllegalArgumentException("Cannot use 'first' with 'before'");
-    }
-
-    // not allowed: last + after
-    if (hasLast && hasAfter) {
-        throw new IllegalArgumentException("Cannot use 'last' with 'after'");
-    }
-}
 }

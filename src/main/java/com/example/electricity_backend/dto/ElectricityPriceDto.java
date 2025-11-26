@@ -1,10 +1,12 @@
 package com.example.electricity_backend.dto;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@Value
+@Getter
+@AllArgsConstructor
 public class ElectricityPriceDto {
-    private String startDate;
-    private String endDate;
-    private double price;
+    private final String startDate;
+    private final String endDate;
+    private final double price;
 }

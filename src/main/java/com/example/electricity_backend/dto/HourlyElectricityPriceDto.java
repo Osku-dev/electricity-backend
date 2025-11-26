@@ -2,15 +2,17 @@ package com.example.electricity_backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@Value
+@Getter
+@AllArgsConstructor
 public class HourlyElectricityPriceDto {
 
-    private Double price;
+    private final Double price;
 
     @JsonProperty("second_hour_price") // edge case when switching to winter time
-    private Double secondHourPrice;
+    private final Double secondHourPrice;
 
 
 }
