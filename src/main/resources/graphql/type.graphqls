@@ -1,6 +1,7 @@
 type PriceConnection {
   edges: [PriceEdge!]!
   pageInfo: PageInfo!
+  stats: Stats
 }
 
 type PriceEdge {
@@ -19,4 +20,10 @@ type PageInfo {
   endCursor: String
   hasPreviousPage: Boolean!
   hasNextPage: Boolean!
+}
+
+type Stats {
+  minPrice: Float
+  maxPrice: Float
+  avgPrice: Float
 }

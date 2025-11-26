@@ -2,20 +2,20 @@ package com.example.electricity_backend.dto;
 
 import org.springframework.lang.NonNull;
 
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@RequiredArgsConstructor
-@Value
+@Getter
+@AllArgsConstructor
 // graphql dto
 public class Price {
     @NonNull
-    private String timestamp;
+    private final String timestamp;
 
-    private float value;
+    private final float value;
 
     @NonNull
-    private String resolutionMinutes;
+    private final String resolutionMinutes;
 
     
 }
