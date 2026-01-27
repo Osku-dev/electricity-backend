@@ -7,6 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ElectricityPriceDto {
     private final String startDate;
-    private final String endDate;
     private final double price;
 }
