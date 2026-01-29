@@ -1,8 +1,5 @@
 package com.example.electricity_backend.resolver.query;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,7 +13,10 @@ import com.example.electricity_backend.dto.PriceConnectionWithStats;
 import com.example.electricity_backend.dto.Stats;
 import com.example.electricity_backend.mapper.PriceMapper;
 import com.example.electricity_backend.model.PriceEntity;
-import com.example.electricity_backend.service.PriceService;
+import com.example.electricity_backend.service.pagination.PaginatedResult;
+import com.example.electricity_backend.service.pagination.PricePaginationArgs;
+import com.example.electricity_backend.service.pagination.PricePaginationService;
+import com.example.electricity_backend.service.price.PriceStatsService;
 
 import graphql.relay.DefaultEdge;
 import graphql.relay.DefaultPageInfo;
@@ -27,8 +27,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PriceResolver {
 
-    private final PriceService priceService;
+    private final PricePaginationService paginationService;
     private final CursorUtil cursorUtil;
+    private final PriceStatsService priceStatsService;
 
     @QueryMapping
     public PriceConnectionWithStats prices(
@@ -37,64 +38,18 @@ public class PriceResolver {
             @Argument Integer last,
             @Argument String before
     ) {
-        List<PriceEntity> entities;
-        boolean hasNextPage = false;
-        boolean hasPreviousPage = false;
 
-        validatePaginationArgs(first, last, after, before);
+        var args = new PricePaginationArgs(first, after, last, before);
 
-        if (after != null && first != null) {
-            LocalDateTime afterTime = LocalDateTime.parse(cursorUtil.decodeCursor(after));
-            entities = priceService.getPricesAfter(afterTime, first);
-            if (entities.size() > first) {
-                hasNextPage = true;
-                entities = entities.subList(0, first);
-            }
-            hasPreviousPage = after != null;
+        PaginatedResult<PriceEntity> page =
+                paginationService.fetch(args);
 
-        } else if (before != null && last != null) {
-            LocalDateTime beforeTime = LocalDateTime.parse(cursorUtil.decodeCursor(before));
-            entities = priceService.getPricesBefore(beforeTime, last);
-            if (entities.size() > last) {
-                hasPreviousPage = true;
-                entities = entities.subList(0, last);
-            }
-            hasNextPage = before != null;
-
-        } else if (first != null) {
-            entities = priceService.getOldest(first);
-            if (entities.size() > first) {
-                hasNextPage = true;
-                entities = entities.subList(0, first);
-            }
-
-        } else if (last != null) {
-            entities = priceService.getNewest(last);
-            if (entities.size() > last) {
-                hasPreviousPage = true;
-                entities = entities.subList(0, last);
-            }
-
-        } else if (first == null && last == null && after == null && before == null) {
-            entities = priceService.getNewest(192); // newest 48h entries for 15min resolution
-            if (entities.size() > 192) {
-                hasPreviousPage = true;
-                entities = entities.subList(0, 192);
-            }
-
-        } else {
-            throw new IllegalArgumentException("Invalid pagination arguments");
-        }
-
-        // Map entities to DTOs
-        List<Price> prices = entities.stream()
+        List<Price> prices = page.items().stream()
                 .map(PriceMapper::fromEntity)
-                .collect(Collectors.toList());
+                .toList();
 
-        // Compute stats
-        Stats stats = computeStats(prices);
+        Stats stats = priceStatsService.computeStats(prices);
 
-        // Build edges for cursor pagination
         List<Edge<Price>> edges = prices.stream()
                 .map(price -> new DefaultEdge<>(
                         price,
@@ -102,50 +57,14 @@ public class PriceResolver {
                 ))
                 .collect(Collectors.toList());
 
-        // Build PageInfo
         var pageInfo = new DefaultPageInfo(
                 cursorUtil.getFirstCursorFrom(edges),
                 cursorUtil.getLastCursorFrom(edges),
-                hasPreviousPage,
-                hasNextPage
+                page.hasPreviousPage(),
+                page.hasNextPage()
         );
 
         return new PriceConnectionWithStats(edges, pageInfo, stats);
     }
 
-    private Stats computeStats(List<Price> prices) {
-    if (prices.isEmpty()) return new Stats(BigDecimal.ZERO.floatValue(),
-                                           BigDecimal.ZERO.floatValue(),
-                                           BigDecimal.ZERO.floatValue());
-
-    BigDecimal min = BigDecimal.valueOf(Float.MAX_VALUE);
-    BigDecimal max = BigDecimal.valueOf(Float.MIN_VALUE);
-    BigDecimal sum = BigDecimal.ZERO;
-
-    for (Price p : prices) {
-        BigDecimal price = BigDecimal.valueOf(p.getValue());
-        if (price.compareTo(min) < 0) min = price;
-        if (price.compareTo(max) > 0) max = price;
-        sum = sum.add(price);
-    }
-
-    BigDecimal avg = sum.divide(BigDecimal.valueOf(prices.size()), 2, RoundingMode.HALF_UP);
-
-    // Round min and max to 2 decimals
-    min = min.setScale(2, RoundingMode.HALF_UP);
-    max = max.setScale(2, RoundingMode.HALF_UP);
-
-    return new Stats(min.floatValue(), max.floatValue(), avg.floatValue());
-}
-
-    private void validatePaginationArgs(Integer first, Integer last, String after, String before) {
-        boolean hasFirst = first != null;
-        boolean hasLast = last != null;
-        boolean hasAfter = after != null;
-        boolean hasBefore = before != null;
-
-        if (hasFirst && hasLast) throw new IllegalArgumentException("Cannot use 'first' and 'last' together");
-        if (hasFirst && hasBefore) throw new IllegalArgumentException("Cannot use 'first' with 'before'");
-        if (hasLast && hasAfter) throw new IllegalArgumentException("Cannot use 'last' with 'after'");
-    }
 }

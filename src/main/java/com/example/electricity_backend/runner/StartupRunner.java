@@ -3,7 +3,7 @@ package com.example.electricity_backend.runner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import com.example.electricity_backend.service.ElectricityPriceSyncService;
+import com.example.electricity_backend.service.price.ElectricityPriceSyncService;
 
 // Runner to execute the sync service at application startup
 
