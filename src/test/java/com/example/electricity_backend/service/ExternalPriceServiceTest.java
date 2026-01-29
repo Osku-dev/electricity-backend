@@ -20,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.electricity_backend.dto.ElectricityPriceDto;
 import com.example.electricity_backend.dto.ElectricityPriceResponseDto;
+import com.example.electricity_backend.service.price.ExternalPriceService;
 
 class ExternalPriceServiceTest {
 

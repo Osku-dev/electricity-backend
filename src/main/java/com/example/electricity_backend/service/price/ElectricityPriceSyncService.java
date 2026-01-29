@@ -1,4 +1,4 @@
-package com.example.electricity_backend.service;
+package com.example.electricity_backend.service.price;
 
 import java.util.List;
 
