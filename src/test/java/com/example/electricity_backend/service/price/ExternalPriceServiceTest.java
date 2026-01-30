@@ -1,4 +1,4 @@
-package com.example.electricity_backend.service;
+package com.example.electricity_backend.service.price;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.mockito.ArgumentMatchers;
@@ -20,7 +20,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.electricity_backend.dto.ElectricityPriceDto;
 import com.example.electricity_backend.dto.ElectricityPriceResponseDto;
-import com.example.electricity_backend.service.price.ExternalPriceService;
 
 class ExternalPriceServiceTest {
 
