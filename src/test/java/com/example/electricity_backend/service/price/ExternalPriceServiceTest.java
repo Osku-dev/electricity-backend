@@ -2,6 +2,8 @@ package com.example.electricity_backend.service.price;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -11,6 +13,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -21,14 +24,16 @@ import org.springframework.web.client.RestTemplate;
 import com.example.electricity_backend.dto.ElectricityPriceDto;
 import com.example.electricity_backend.dto.ElectricityPriceResponseDto;
 
+@ExtendWith(MockitoExtension.class)
 class ExternalPriceServiceTest {
 
+    @Mock
     private RestTemplate restTemplate;
+
     private ExternalPriceService service;
 
     @BeforeEach
     void setup() {
-        restTemplate = mock(RestTemplate.class);
         service = new ExternalPriceService(restTemplate, "http://test-url");
 
     }
