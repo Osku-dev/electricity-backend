@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.electricity_backend.connection.CursorUtil;
+import com.example.electricity_backend.dto.PaginatedResult;
+import com.example.electricity_backend.dto.PricePaginationArgs;
 import com.example.electricity_backend.model.PriceEntity;
 import com.example.electricity_backend.service.price.PriceService;
 

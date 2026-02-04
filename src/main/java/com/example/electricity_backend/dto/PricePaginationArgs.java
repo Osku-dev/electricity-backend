@@ -1,4 +1,4 @@
-package com.example.electricity_backend.service.pagination;
+package com.example.electricity_backend.dto;
 
 public record PricePaginationArgs (
     Integer first,
