@@ -8,13 +8,13 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 import com.example.electricity_backend.connection.CursorUtil;
+import com.example.electricity_backend.dto.PaginatedResult;
 import com.example.electricity_backend.dto.Price;
 import com.example.electricity_backend.dto.PriceConnectionWithStats;
+import com.example.electricity_backend.dto.PricePaginationArgs;
 import com.example.electricity_backend.dto.Stats;
 import com.example.electricity_backend.mapper.PriceMapper;
 import com.example.electricity_backend.model.PriceEntity;
-import com.example.electricity_backend.service.pagination.PaginatedResult;
-import com.example.electricity_backend.service.pagination.PricePaginationArgs;
 import com.example.electricity_backend.service.pagination.PricePaginationService;
 import com.example.electricity_backend.service.price.PriceStatsService;
 

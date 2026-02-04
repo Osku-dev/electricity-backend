@@ -1,8 +1,10 @@
 package com.example.electricity_backend.service.pagination;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+import com.example.electricity_backend.dto.PricePaginationArgs;
+
+@Component
 public class PricePaginationValidator {
 
     public void validate(PricePaginationArgs args) {
