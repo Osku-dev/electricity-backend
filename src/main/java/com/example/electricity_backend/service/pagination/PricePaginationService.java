@@ -20,6 +20,7 @@ public class PricePaginationService {
     private final PriceService priceService;
     private final CursorUtil cursorUtil;
     private final PricePaginationValidator validator;
+    private static final int DEFAULT_PRICE_POINTS_48H_15MIN = 192;
 
     public PaginatedResult<PriceEntity> fetch(PricePaginationArgs args) {
         
@@ -103,12 +104,12 @@ public class PricePaginationService {
     }
 
     private PaginatedResult<PriceEntity> fetchDefault() {
-        List<PriceEntity> entities = priceService.getNewest(192 + 1); // newest 48h entries for 15min resolution
+        List<PriceEntity> entities = priceService.getNewest(DEFAULT_PRICE_POINTS_48H_15MIN + 1);
 
-        boolean hasPreviousPage = entities.size() > 192;
+        boolean hasPreviousPage = entities.size() > DEFAULT_PRICE_POINTS_48H_15MIN;
         boolean hasNextPage = false;
         if (hasPreviousPage) {
-            entities = entities.subList(0, 192);
+            entities = entities.subList(0, DEFAULT_PRICE_POINTS_48H_15MIN);
         }
         
 
