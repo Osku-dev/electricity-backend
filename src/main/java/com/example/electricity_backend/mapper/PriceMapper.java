@@ -17,11 +17,11 @@ public class PriceMapper {
      * Convert API DTO → JPA Entity.
      */
     public static PriceEntity toEntity(ElectricityPriceDto dto, int resolutionMinutes) {
-        String raw = dto.getStartDate();
-        String cleaned = raw.replace("Z", "").replace(".000", "");
+        String rawDate = dto.getStartDate();
+        String cleanedDate = rawDate.replace("Z", "").replace(".000", "");
 
         PriceEntity entity = new PriceEntity();
-        entity.setStartTime(LocalDateTime.parse(cleaned));
+        entity.setStartTime(LocalDateTime.parse(cleanedDate));
         entity.setPrice(BigDecimal.valueOf(dto.getPrice()));
         entity.setResolutionMinutes(resolutionMinutes);
         return entity;
