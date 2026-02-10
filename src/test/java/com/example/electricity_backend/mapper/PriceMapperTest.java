@@ -43,8 +43,8 @@ class PriceMapperTest {
 
         Price price = PriceMapper.fromEntity(entity);
 
-        assertEquals("2024-01-01T12:00", price.getTimestamp());
-        assertEquals(99.99f, price.getValue(), 0.0001f);
-        assertEquals("15", price.getResolutionMinutes());
+        assertEquals("2024-01-01T12:00", price.timestamp());
+        assertEquals(99.99f, price.value(), 0.0001f);
+        assertEquals("15", price.resolutionMinutes());
     }
 }

@@ -22,7 +22,7 @@ public class PriceStatsService {
     BigDecimal sum = BigDecimal.ZERO;
 
     for (Price p : prices) {
-        BigDecimal price = BigDecimal.valueOf(p.getValue());
+        BigDecimal price = BigDecimal.valueOf(p.value());
         if (price.compareTo(min) < 0) min = price;
         if (price.compareTo(max) > 0) max = price;
         sum = sum.add(price);
