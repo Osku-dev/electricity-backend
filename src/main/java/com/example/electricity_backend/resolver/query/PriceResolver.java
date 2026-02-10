@@ -53,7 +53,7 @@ public class PriceResolver {
         List<Edge<Price>> edges = prices.stream()
                 .map(price -> new DefaultEdge<>(
                         price,
-                        cursorUtil.createCursorWith(price.getTimestamp())
+                        cursorUtil.createCursorWith(price.timestamp())
                 ))
                 .collect(Collectors.toList());
 
