@@ -33,16 +33,16 @@ import graphql.relay.DefaultConnectionCursor;
 class PriceResolverTest {
 
     @Mock
-    PricePaginationService paginationService;
+    private PricePaginationService paginationService;
 
     @Mock
-    CursorUtil cursorUtil;
+    private CursorUtil cursorUtil;
 
     @Mock
-    PriceStatsService priceStatsService;
+    private PriceStatsService priceStatsService;
 
     @InjectMocks
-    PriceResolver resolver;
+     private PriceResolver resolver;
 
     @Test
     void pricesReturnsConnectionWithStats() {
