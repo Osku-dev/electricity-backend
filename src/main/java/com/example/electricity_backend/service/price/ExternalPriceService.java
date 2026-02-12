@@ -2,7 +2,6 @@ package com.example.electricity_backend.service.price;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -26,13 +25,11 @@ public class ExternalPriceService {
         LoggerFactory.getLogger(ExternalPriceService.class);
 
     private final RestTemplate restTemplate;
-    
-    private String DAILY_PRICES_URL;
+    private final String dailyPricesUrl;
 
-    @Autowired
     public ExternalPriceService(RestTemplate restTemplate, @Value("${DAILY_PRICES_URL}") String dailyPricesUrl) {
         this.restTemplate = restTemplate;
-        this.DAILY_PRICES_URL = dailyPricesUrl;
+        this.dailyPricesUrl = dailyPricesUrl;
     }
     
    public List<ElectricityPriceDto> fetchDailyPrices() {
@@ -40,7 +37,7 @@ public class ExternalPriceService {
 
     try {
         response = restTemplate.exchange(
-            DAILY_PRICES_URL,
+            dailyPricesUrl,
             HttpMethod.GET,
             HttpEntity.EMPTY,
             new ParameterizedTypeReference<ElectricityPriceResponseDto>() {}

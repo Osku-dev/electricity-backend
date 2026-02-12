@@ -16,9 +16,11 @@ import graphql.schema.DataFetchingEnvironment;
 @Component
 public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter {
 
-    @Value("${spring.profiles.active:prod}")
-    private String activeProfile;
+    private final String activeProfile;
 
+    public GraphQLExceptionHandler(@Value("${spring.profiles.active:prod}") String activeProfile) {
+    this.activeProfile = activeProfile;
+}
     @Override
     protected GraphQLError resolveToSingleError(@NonNull Throwable ex, @NonNull DataFetchingEnvironment env) {
 
