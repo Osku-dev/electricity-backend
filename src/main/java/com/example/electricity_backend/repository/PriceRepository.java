@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface PriceRepository extends JpaRepository<PriceEntity, Long> {
 
+    boolean existsByStartTimeBetween(LocalDateTime start, LocalDateTime end);
+
     // Find all prices in a time range
     List<PriceEntity> findByStartTimeAfter(LocalDateTime start);
 
