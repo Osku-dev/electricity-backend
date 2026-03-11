@@ -1,7 +1,9 @@
 package com.example.electricity_backend.service.price;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -24,95 +26,133 @@ class PriceServiceTest {
     @Mock
     private PriceRepository priceRepository;
 
+    @Mock
+    private ElectricityPriceSyncService syncService;
+
     private PriceService priceService;
 
     @BeforeEach
     void setUp() {
-        priceService = new PriceService(priceRepository);
+        priceService = new PriceService(priceRepository, syncService);
     }
+
 
     @Test
-    void getPricesAfter_callsRepositoryWithLimitPlusOne() {
-        LocalDateTime after = LocalDateTime.now();
-        int limit = 10;
+void fetchTomorrowPricesIfMissing_doesNothingIfPricesExist() {
 
-        List<PriceEntity> mockResult = List.of(
-                new PriceEntity(),
-                new PriceEntity()
-        );
+    when(priceRepository.existsByStartTimeBetween(any(), any()))
+        .thenReturn(true);
 
-        when(priceRepository.findByStartTimeAfterOrderByStartTimeAsc(
-                eq(after),
-                eq(PageRequest.of(0, limit + 1))
-        )).thenReturn(mockResult);
+    priceService.fetchTomorrowPricesIfMissing();
 
-        List<PriceEntity> result =
-                priceService.getPricesAfter(after, limit);
+    verify(priceRepository)
+        .existsByStartTimeBetween(any(), any());
 
-        assertEquals(mockResult, result);
+    verify(syncService, never())
+        .syncNewBatch();
+}
 
-        verify(priceRepository).findByStartTimeAfterOrderByStartTimeAsc(
-                eq(after),
-                eq(PageRequest.of(0, limit + 1))
-        );
-    }
+@Test
+void fetchTomorrowPricesIfMissing_triggersSyncIfPricesMissing() {
 
-    @Test
-    void getPricesBefore_reversesResultOrder() {
-        LocalDateTime before = LocalDateTime.now();
-        int limit = 2;
+    when(priceRepository.existsByStartTimeBetween(any(), any()))
+        .thenReturn(false);
 
-        PriceEntity first = new PriceEntity();
-        PriceEntity second = new PriceEntity();
+    priceService.fetchTomorrowPricesIfMissing();
 
-        // Repository returns DESC
-        when(priceRepository.findByStartTimeBeforeOrderByStartTimeDesc(
-                eq(before),
-                eq(PageRequest.of(0, limit + 1))
-        )).thenReturn(List.of(first, second));
+    verify(priceRepository)
+        .existsByStartTimeBetween(any(), any());
 
-        List<PriceEntity> result =
-                priceService.getPricesBefore(before, limit);
+    verify(syncService)
+        .syncNewBatch();
+}
 
-        // Service reverses to ASC
-        assertEquals(second, result.get(0));
-        assertEquals(first, result.get(1));
-    }
+@Test
+void getPricesAfter_callsRepositoryWithLimitPlusOne() {
 
-    @Test
-    void getNewest_reversesDescendingOrder() {
-        int limit = 3;
+    LocalDateTime after = LocalDateTime.now();
+    int limit = 10;
 
-        PriceEntity newest = new PriceEntity();
-        PriceEntity older = new PriceEntity();
+    List<PriceEntity> mockResult = List.of(
+        new PriceEntity(),
+        new PriceEntity()
+    );
 
-        when(priceRepository.findAllByOrderByStartTimeDesc(
-                eq(PageRequest.of(0, limit + 1))
-        )).thenReturn(List.of(newest, older));
+    when(priceRepository.findByStartTimeAfterOrderByStartTimeAsc(
+            eq(after),
+            eq(PageRequest.of(0, limit + 1))
+    )).thenReturn(mockResult);
 
-        List<PriceEntity> result =
-                priceService.getNewest(limit);
+    List<PriceEntity> result =
+        priceService.getPricesAfter(after, limit);
 
-        assertEquals(older, result.get(0));
-        assertEquals(newest, result.get(1));
-    }
+    assertEquals(mockResult, result);
 
-    @Test
-    void getOldest_returnsRepositoryResultAsIs() {
-        int limit = 5;
+    verify(priceRepository).findByStartTimeAfterOrderByStartTimeAsc(
+        eq(after),
+        eq(PageRequest.of(0, limit + 1))
+    );
+}
 
-        List<PriceEntity> entities = List.of(
-                new PriceEntity(),
-                new PriceEntity()
-        );
+@Test
+void getPricesBefore_reversesResultOrder() {
 
-        when(priceRepository.findAllByOrderByStartTimeAsc(
-                eq(PageRequest.of(0, limit + 1))
-        )).thenReturn(entities);
+    LocalDateTime before = LocalDateTime.now();
+    int limit = 2;
 
-        List<PriceEntity> result =
-                priceService.getOldest(limit);
+    PriceEntity first = new PriceEntity();
+    PriceEntity second = new PriceEntity();
 
-        assertEquals(entities, result);
-    }
+    // Repository returns DESC
+    when(priceRepository.findByStartTimeBeforeOrderByStartTimeDesc(
+            eq(before),
+            eq(PageRequest.of(0, limit + 1))
+    )).thenReturn(List.of(first, second));
+
+    List<PriceEntity> result =
+        priceService.getPricesBefore(before, limit);
+
+    // Service reverses to ASC
+    assertEquals(second, result.get(0));
+    assertEquals(first, result.get(1));
+}
+
+@Test
+void getNewest_reversesDescendingOrder() {
+
+    int limit = 3;
+
+    PriceEntity newest = new PriceEntity();
+    PriceEntity older = new PriceEntity();
+
+    when(priceRepository.findAllByOrderByStartTimeDesc(
+            eq(PageRequest.of(0, limit + 1))
+    )).thenReturn(List.of(newest, older));
+
+    List<PriceEntity> result =
+        priceService.getNewest(limit);
+
+    assertEquals(older, result.get(0));
+    assertEquals(newest, result.get(1));
+}
+
+@Test
+void getOldest_returnsRepositoryResultAsIs() {
+
+    int limit = 5;
+
+    List<PriceEntity> entities = List.of(
+        new PriceEntity(),
+        new PriceEntity()
+    );
+
+    when(priceRepository.findAllByOrderByStartTimeAsc(
+            eq(PageRequest.of(0, limit + 1))
+    )).thenReturn(entities);
+
+    List<PriceEntity> result =
+        priceService.getOldest(limit);
+
+    assertEquals(entities, result);
+}
 }
