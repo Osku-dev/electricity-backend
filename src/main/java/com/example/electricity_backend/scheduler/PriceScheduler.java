@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.example.electricity_backend.service.price.ExternalPriceService;
 import com.example.electricity_backend.service.price.PriceService;
 
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class PriceScheduler {
 
     private static final Logger log =
-        LoggerFactory.getLogger(ExternalPriceService.class);
+        LoggerFactory.getLogger(PriceScheduler.class);
 
     private final PriceService priceService;
 
