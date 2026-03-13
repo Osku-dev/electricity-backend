@@ -35,6 +35,8 @@ public class ExternalPriceService {
    public List<ElectricityPriceDto> fetchDailyPrices() {
     ResponseEntity<ElectricityPriceResponseDto> response;
 
+    log.info("Fetching prices from external API");
+
     try {
         response = restTemplate.exchange(
             dailyPricesUrl,
