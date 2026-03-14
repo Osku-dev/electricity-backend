@@ -2,6 +2,8 @@ package com.example.electricity_backend.service.price;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ public class ElectricityPriceSyncService {
 
     private final JdbcTemplate jdbcTemplate;
     private final ExternalPriceService externalPriceService;
+    private static final Logger log =
+        LoggerFactory.getLogger(ElectricityPriceSyncService.class);
 
     @Transactional
     public void syncNewBatch() {
@@ -41,6 +45,7 @@ public class ElectricityPriceSyncService {
             })
             .toList();
 
+            log.info("Syncing {} new electricity prices to the database", batchArgs.size());
         jdbcTemplate.batchUpdate(sql, batchArgs);
     }
 }
