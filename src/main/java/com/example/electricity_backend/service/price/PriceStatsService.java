@@ -18,7 +18,7 @@ public class PriceStatsService {
                                            BigDecimal.ZERO.floatValue());
 
     BigDecimal min = BigDecimal.valueOf(Float.MAX_VALUE);
-    BigDecimal max = BigDecimal.valueOf(Float.MIN_VALUE);
+    BigDecimal max = BigDecimal.valueOf(-Float.MAX_VALUE);
     BigDecimal sum = BigDecimal.ZERO;
 
     for (Price p : prices) {
@@ -28,10 +28,10 @@ public class PriceStatsService {
         sum = sum.add(price);
     }
 
-    BigDecimal avg = sum.divide(BigDecimal.valueOf(prices.size()), 2, RoundingMode.HALF_UP);
+    BigDecimal avg = sum.divide(BigDecimal.valueOf(prices.size()), 3, RoundingMode.HALF_UP);
 
-    min = min.setScale(2, RoundingMode.HALF_UP);
-    max = max.setScale(2, RoundingMode.HALF_UP);
+    min = min.setScale(3, RoundingMode.HALF_UP);
+    max = max.setScale(3, RoundingMode.HALF_UP);
 
     return new Stats(min.floatValue(), max.floatValue(), avg.floatValue());
 }
