@@ -5,7 +5,7 @@ import org.springframework.lang.NonNull;
 
 public record Price(
     @NonNull String timestamp,
-    float value,
+    double value,
     @NonNull String resolutionMinutes
 ) {}
 
