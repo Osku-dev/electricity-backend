@@ -25,46 +25,46 @@ class PriceStatsServiceTest {
     void returnsZerosForEmptyList() {
         Stats stats = service.computeStats(List.of());
 
-        assertThat(stats.getMinPrice()).isEqualTo(0.00f);
-        assertThat(stats.getMaxPrice()).isEqualTo(0.00f);
-        assertThat(stats.getAvgPrice()).isEqualTo(0.00f);
+        assertThat(stats.minPrice()).isEqualTo(0.00);
+        assertThat(stats.maxPrice()).isEqualTo(0.00);
+        assertThat(stats.avgPrice()).isEqualTo(0.00);
     }
 
     @Test
     void computesStatsForSinglePrice() {
-        Stats stats = service.computeStats(List.of(price(10.123f)));
+        Stats stats = service.computeStats(List.of(price(10.123)));
 
-        assertThat(stats.getMinPrice()).isEqualTo(10.12f);
-        assertThat(stats.getMaxPrice()).isEqualTo(10.12f);
-        assertThat(stats.getAvgPrice()).isEqualTo(10.12f);
+        assertThat(stats.minPrice()).isEqualTo(10.12);
+        assertThat(stats.maxPrice()).isEqualTo(10.12);
+        assertThat(stats.avgPrice()).isEqualTo(10.12);
     }
 
     @Test
     void computesStatsForMultiplePrices() {
         Stats stats = service.computeStats(List.of(
-            price(10.0f),
-            price(20.0f),
-            price(30.0f)
+            price(10.0),
+            price(20.0),
+            price(30.0)
         ));
 
-        assertThat(stats.getMinPrice()).isEqualTo(10.00f);
-        assertThat(stats.getMaxPrice()).isEqualTo(30.00f);
-        assertThat(stats.getAvgPrice()).isEqualTo(20.00f);
+        assertThat(stats.minPrice()).isEqualTo(10.00);
+        assertThat(stats.maxPrice()).isEqualTo(30.00);
+        assertThat(stats.avgPrice()).isEqualTo(20.00);
     }
 
     @Test
     void roundsCorrectlyToTwoDecimals() {
         Stats stats = service.computeStats(List.of(
-            price(10.111f),
-            price(10.119f)
+            price(10.111),
+            price(10.119)
         ));
 
-        assertThat(stats.getMinPrice()).isEqualTo(10.11f);
-        assertThat(stats.getMaxPrice()).isEqualTo(10.12f);
-        assertThat(stats.getAvgPrice()).isEqualTo(10.12f);
+        assertThat(stats.minPrice()).isEqualTo(10.11);
+        assertThat(stats.maxPrice()).isEqualTo(10.12);
+        assertThat(stats.avgPrice()).isEqualTo(10.12);
     }
 
-    private Price price(float value) {
+    private Price price(double value) {
         return new Price(
             FIXED_TIMESTAMP,
             value,

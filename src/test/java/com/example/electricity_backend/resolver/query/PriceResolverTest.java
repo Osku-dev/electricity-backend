@@ -73,7 +73,7 @@ class PriceResolverTest {
         when(cursorUtil.getLastCursorFrom(any()))
                 .thenReturn(cursor);
 
-        Stats stats = new Stats(null, null, null);
+        Stats stats = new Stats(0.0, 0.0, 0.0);
         when(priceStatsService.computeStats(any()))
                 .thenReturn(stats);
 
