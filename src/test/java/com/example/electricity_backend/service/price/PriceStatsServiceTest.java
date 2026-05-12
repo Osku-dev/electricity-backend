@@ -34,9 +34,9 @@ class PriceStatsServiceTest {
     void computesStatsForSinglePrice() {
         Stats stats = service.computeStats(List.of(price(10.123)));
 
-        assertThat(stats.minPrice()).isEqualTo(10.12);
-        assertThat(stats.maxPrice()).isEqualTo(10.12);
-        assertThat(stats.avgPrice()).isEqualTo(10.12);
+        assertThat(stats.minPrice()).isEqualTo(10.123);
+        assertThat(stats.maxPrice()).isEqualTo(10.123);
+        assertThat(stats.avgPrice()).isEqualTo(10.123);
     }
 
     @Test
@@ -59,9 +59,9 @@ class PriceStatsServiceTest {
             price(10.119)
         ));
 
-        assertThat(stats.minPrice()).isEqualTo(10.11);
-        assertThat(stats.maxPrice()).isEqualTo(10.12);
-        assertThat(stats.avgPrice()).isEqualTo(10.12);
+        assertThat(stats.minPrice()).isEqualTo(10.111);
+        assertThat(stats.maxPrice()).isEqualTo(10.119);
+        assertThat(stats.avgPrice()).isEqualTo(10.115);
     }
 
     private Price price(double value) {
