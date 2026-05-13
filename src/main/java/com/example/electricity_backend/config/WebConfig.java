@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${FRONTEND_URL}")
+    @Value("${FRONTEND_URL:http://localhost:3000}")
 private String frontendUrl;
 
     @Override
