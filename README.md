@@ -35,5 +35,3 @@ This allows the mobile app to later add features like browsing older price data 
 4. Provision a Render PostgreSQL database and copy its internal connection details.
 5. Add required environment variables in Render (for example: `spring.datasource.url`, `spring.datasource.username`, `spring.datasource.password`, `DAILY_PRICES_URL`, `HOURLY_PRICE_URL`, `FRONTEND_URL`).
 6. In Render service settings, create a **Deploy Hook** and save its URL to GitHub Actions secret `RENDER_DEPLOY_HOOK_URL`.
-
-//testing
